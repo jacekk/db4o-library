@@ -426,7 +426,10 @@ namespace Library
 		}
 		private void editAuthor()
 		{
-			MessageBox.Show("TODO");
+			var author = authorsListGrid.SelectedItem as Author;
+			var dlg = new EditAuthorWindow(ref _db, author);
+			dlg.ShowDialog();
+			showAuthorsList();
 		}
 		private void editPublicationBtn_Click(object sender, RoutedEventArgs e)
 		{

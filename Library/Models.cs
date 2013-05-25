@@ -20,4 +20,10 @@ namespace Library
 		public char Type { get; set; }
 		public List<Author> Authors { get; set; }
 	}
+	public class PublicationEdit
+	{
+		public string Title { get; set; }
+		public int Year { get; set; }
+		public bool IsAuthor { get; set; }
+	}
 }
