@@ -7,15 +7,15 @@
             <ColumnDefinition Width="145"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-		<Button Grid.Column="0" x:Name="showAuthorsBtn" Content="pokaż autorów" Margin="10,10,0,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Left" Width="120" Click="showAuthorsBtn_Click"/>
-		<Button Grid.Column="0" x:Name="showPublicationBtn" Content="pokaż publikacje" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="showPublicationBtn_Click"/>
-		<Button Grid.Column="0" x:Name="addAuthorsBtn" Content="dodaj autorów" Margin="10,120,0,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Left" Width="120" Click="addAuthorsBtn_Click"/>
-		<Button Grid.Column="0" x:Name="addPublicationBtn" Content="dodaj publikacje" Margin="10,147,0,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Left" Width="120" Click="addPublicationBtn_Click"/>
-		<Button Grid.Column="0" x:Name="addRelationsBtn" Content="dodaj relacje" Margin="10,174,0,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Left" Width="120" Click="addRelationsBtn_Click"/>
-		<Button Grid.Column="0" x:Name="exportAuthorsBtn" Content="exportuj autorów" HorizontalAlignment="Left" Margin="10,251,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="exportAuthorsBtn_Click"/>
-		<Button Grid.Column="0" x:Name="exportPublicationsBtn" Content="exportuj publikacje" HorizontalAlignment="Left" Margin="10,281,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="exportPublicationsBtn_Click"/>
-		<Button Grid.Column="0" x:Name="exportRelationsBtn" Content="exportuj relacje" HorizontalAlignment="Left" Margin="10,312,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="exportRelationsBtn_Click"/>
-		<Button Grid.Column="0" x:Name="clearDatabaseBtn" Content="wyczyść bazę" HorizontalAlignment="Left" Margin="10,400,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="clearDatabaseBtn_Click"/>
+		<Button Grid.Column="0" x:Name="showAuthorsBtn" Content="pokaż autorów" Margin="10,10,0,0" VerticalAlignment="Top" Height="24" HorizontalAlignment="Left" Width="120" Click="showAuthorsBtn_Click"/>
+		<Button Grid.Column="0" x:Name="showPublicationBtn" Content="pokaż publikacje" HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top" Width="120" Height="24" Click="showPublicationBtn_Click"/>
+		<Button Grid.Column="0" x:Name="addAuthorsBtn" Content="dodaj autorów" Margin="10,118,0,0" VerticalAlignment="Top" Height="24" HorizontalAlignment="Left" Width="120" Click="addAuthorsBtn_Click"/>
+		<Button Grid.Column="0" x:Name="addPublicationBtn" Content="dodaj publikacje" Margin="10,147,0,0" VerticalAlignment="Top" Height="24" HorizontalAlignment="Left" Width="120" Click="addPublicationBtn_Click"/>
+		<Button Grid.Column="0" x:Name="addRelationsBtn" Content="dodaj relacje" Margin="10,176,0,0" VerticalAlignment="Top" Height="24" HorizontalAlignment="Left" Width="120" Click="addRelationsBtn_Click"/>
+		<Button Grid.Column="0" x:Name="exportAuthorsBtn" Content="exportuj autorów" HorizontalAlignment="Left" Margin="10,251,0,0" VerticalAlignment="Top" Width="120" Height="24" Click="exportAuthorsBtn_Click"/>
+		<Button Grid.Column="0" x:Name="exportPublicationsBtn" Content="exportuj publikacje" HorizontalAlignment="Left" Margin="10,281,0,0" VerticalAlignment="Top" Width="120" Height="24" Click="exportPublicationsBtn_Click"/>
+		<Button Grid.Column="0" x:Name="exportRelationsBtn" Content="exportuj relacje" HorizontalAlignment="Left" Margin="10,312,0,0" VerticalAlignment="Top" Width="120" Height="24" Click="exportRelationsBtn_Click"/>
+		<Button Grid.Column="0" x:Name="clearDatabaseBtn" Content="wyczyść bazę" HorizontalAlignment="Left" Margin="10,400,0,0" VerticalAlignment="Top" Width="120" Height="24" Click="clearDatabaseBtn_Click"/>
 		<DockPanel Grid.Column="1">
 			<Grid Name="authorsGrid">
 				<Grid.ColumnDefinitions>
@@ -43,6 +43,7 @@
 						<DataGridTextColumn Header="Data Urodzenia" Binding="{Binding Path=BirthDate,StringFormat={}\{0:dd/MM/yyyy\}}"/>
 					</DataGrid.Columns>
 				</DataGrid>
+				<Label Name="authorsPublicationsCount" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Right" HorizontalContentAlignment="Right"/>
 				<Label Name="authorsPublicationsNone" Content="ten autor nie ma przypisanych publikacji" Grid.Column="2" Grid.Row="1"/>
 				<DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left"
 					Name="authorPublicationsListGrid" VerticalAlignment="Top" SelectionMode="Single" CanUserAddRows="False"
@@ -78,7 +79,7 @@
 				</Grid.RowDefinitions>
 				<Label Content="Publikacje wraz z autorami" Grid.Column="0" Grid.Row="0" Width="150" HorizontalAlignment="Left"/>
 				<Label Name="publicationsCount" Content="0" Grid.Column="0" Grid.Row="0" Width="50" HorizontalAlignment="Right" HorizontalContentAlignment="Right"/>
-				<DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left"
+				<DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left" MouseDoubleClick="publicationAuthorsListGrid_MouseDoubleClick"
 					Name="publicationsListGrid" VerticalAlignment="Top" SelectionMode="Single" CanUserAddRows="False"
 					CanUserDeleteRows="False" SelectionUnit="FullRow" SelectionChanged="publicationsListGrid_SelectionChanged"
 					IsReadOnly="True" CanUserResizeColumns="True" MouseLeftButtonDown="publicationsListGrid_MouseLeftButtonDown"
@@ -87,7 +88,7 @@
 					Grid.Column="0" Grid.Row="1">
 					<DataGrid.Columns>
 						<DataGridTextColumn Header="Tytuł" Binding="{Binding Path=Title}"/>
-						<DataGridTextColumn Header="Wydawca" Binding="{Binding Path=Publisher}" />
+						<DataGridTextColumn Header="Wydawca" Binding="{Binding Path=Publisher}" Width="60"/>
 						<DataGridTextColumn Header="Rok"  Binding="{Binding Path=Year}" Width="40"/>
 						<DataGridTextColumn Header="Cena"  Binding="{Binding Path=Price}" Width="40"/>
 						<DataGridTextColumn Header="Od strony" Binding="{Binding Path=PageFrom}" Width="70"/>
@@ -95,6 +96,7 @@
 						<DataGridTextColumn Header="Typ" Binding="{Binding Path=Type}" Width="30"/>
 					</DataGrid.Columns>
 				</DataGrid>
+				<Label Name="publicationsAuthorsCount" Grid.Column="2" Grid.Row="0" Width="50" HorizontalAlignment="Right" HorizontalContentAlignment="Right"/>
 				<TextBlock Name="publicationAuthorsNone" Grid.Column="2" Grid.Row="1" Height="100" VerticalAlignment="Top" TextAlignment="Center">
 					ta publikacja niema przypisanego<LineBreak />
 					żadnego autora

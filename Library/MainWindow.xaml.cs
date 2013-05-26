@@ -230,7 +230,7 @@ namespace Library
 			var collection = new ObservableCollection<Author>();
 			foreach (var item in authors)
 				collection.Add(item as Author);
-			authorsListGrid.ItemsSource = collection;
+			authorsListGrid.ItemsSource = collection.OrderBy(x => x.LastName);
 			authorsListGrid.SelectedItem = null;
 			authorsCount.Content = authors.Count.ToString();
 
@@ -239,7 +239,7 @@ namespace Library
 			authorPublicationsListGrid.Visibility = Visibility.Collapsed;
 			authorsPublicationsNone.Visibility = Visibility.Collapsed;
 			editAuthorBtn.Visibility = Visibility.Collapsed;
-			authorSearchBox.Text = String.Empty;
+			authorSearchBox.Text = String.Empty; // TODO do not override filter
 		}
 		private void showPublicationBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -251,7 +251,7 @@ namespace Library
 			var collection = new ObservableCollection<Publication>();
 			foreach (var item in publications)
 				collection.Add(item as Publication);
-			publicationsListGrid.ItemsSource = collection;
+			publicationsListGrid.ItemsSource = collection.OrderBy(x => x.Title);
 			publicationsListGrid.SelectedItem = null;
 			publicationsCount.Content = publications.Count.ToString();
 
@@ -260,7 +260,7 @@ namespace Library
 			publicationAuthorsListGrid.Visibility = Visibility.Collapsed;
 			publicationAuthorsNone.Visibility = Visibility.Collapsed;
 			editPublicationBtn.Visibility = Visibility.Collapsed;
-			publicationSearchBox.Text = String.Empty;
+			publicationSearchBox.Text = String.Empty; // TODO do not override filter
 		}
 		private void exportAuthorsBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -329,17 +329,19 @@ namespace Library
 				if (pubItem.Authors != null && pubItem.Authors.Contains(selected))
 					collection.Add(pubItem);
 			}
-			authorPublicationsListGrid.ItemsSource = collection;
+			authorPublicationsListGrid.ItemsSource = collection.OrderBy(x => x.Title);
 			authorPublicationsListGrid.SelectedItem = null;
 			if (collection.Count() != 0)
 			{
 				authorPublicationsListGrid.Visibility = Visibility.Visible;
 				authorsPublicationsNone.Visibility = Visibility.Collapsed;
+				authorsPublicationsCount.Content = collection.Count().ToString();
 			}
 			else
 			{
 				authorPublicationsListGrid.Visibility = Visibility.Collapsed;
 				authorsPublicationsNone.Visibility = Visibility.Visible;
+				authorsPublicationsCount.Content = String.Empty;
 			}
 			editAuthorBtn.Visibility = Visibility.Visible;
 		}
@@ -365,17 +367,19 @@ namespace Library
 				if (pubItem.Publications != null && pubItem.Publications.Contains(selected))
 					collection.Add(pubItem);
 			}
-			publicationAuthorsListGrid.ItemsSource = collection;
+			publicationAuthorsListGrid.ItemsSource = collection.OrderBy(x => x.LastName);
 			publicationAuthorsListGrid.SelectedItem = null;
 			if (collection.Count() != 0)
 			{
 				publicationAuthorsListGrid.Visibility = Visibility.Visible;
 				publicationAuthorsNone.Visibility = Visibility.Collapsed;
+				publicationsAuthorsCount.Content = collection.Count().ToString();
 			}
 			else
 			{
 				publicationAuthorsListGrid.Visibility = Visibility.Collapsed;
 				publicationAuthorsNone.Visibility = Visibility.Visible;
+				publicationsAuthorsCount.Content = String.Empty;
 			}
 			editPublicationBtn.Visibility = Visibility.Visible;
 		}
@@ -429,7 +433,11 @@ namespace Library
 			var author = authorsListGrid.SelectedItem as Author;
 			var dlg = new EditAuthorWindow(ref _db, author);
 			dlg.ShowDialog();
-			showAuthorsList();
+			if (dlg.isClosedWithSave)
+			{
+				showAuthorsList();
+				authorsListGrid.SelectedItem = author;
+			}
 		}
 		private void editPublicationBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -441,7 +449,13 @@ namespace Library
 		}
 		private void editPublication()
 		{
-			MessageBox.Show("TODO 2");
+			var publication = publicationsListGrid.SelectedItem as Publication;
+			var dlg = new EditPublicationWindow(ref _db, publication);
+			dlg.ShowDialog();
+			if (dlg.isClosedWithSave){
+				showPublicationList();
+				publicationsListGrid.SelectedItem = publication;
+			}
 		}
 		#endregion
 	}

@@ -14,7 +14,7 @@
 			<RowDefinition Height="24"></RowDefinition>
 			<RowDefinition Height="30"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
-			<RowDefinition Height="30"></RowDefinition>
+			<RowDefinition Height="24"></RowDefinition>
 		</Grid.RowDefinitions>
 		<Label Content="Nazwisko" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Center"/>
 		<TextBox Name="LastNameTxtBox" Grid.Column="0" Grid.Row="1" Height="24"/>
@@ -42,6 +42,6 @@
 				</DataGridTemplateColumn>
 			</DataGrid.Columns>
 		</DataGrid>
-		<Button Name="saveBtn" Grid.Column="0" Grid.Row="5" Content="Zapisz zmiany" Click="saveBtn_Click"/>
+		<Button Name="saveBtn" Grid.Column="0" Height="24" Grid.Row="5" Content="Zapisz zmiany" Click="saveBtn_Click"/>
 	</Grid>
 </Window>
