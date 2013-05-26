@@ -9,29 +9,17 @@ using System.Windows.Input;
 
 namespace Library
 {
-	public partial class EditPublicationWindow : Window
+	public partial class AddPublicationWindow : Window
 	{
 		#region properties
 		private IObjectContainer _db;
-		private Publication _publication;
 		public bool isClosedWithSave = false;
 		#endregion
-		public EditPublicationWindow(ref IObjectContainer db, Publication publication)
+		public AddPublicationWindow(ref IObjectContainer db)
 		{
 			InitializeComponent();
 			TypeCombo.ItemsSource = StaticData.publicationTypes;
 			_db = db;
-			_publication = publication;
-			Title += _publication.Title;
-
-			// fill form
-			TitleTxtBox.Text = _publication.Title;
-			PublisherTxtBox.Text = _publication.Publisher;
-			YearTxtBox.Text = _publication.Year.ToString();
-			PriceTxtBox.Text = _publication.Price.ToString();
-			PageFromTxtBox.Text = _publication.PageFrom.ToString();
-			PageToTxtBox.Text = _publication.PageTo.ToString();
-			TypeCombo.SelectedIndex = _publication.Type == 'A' ? 0 : 1;
 
 			var collection = new ObservableCollection<AuthorEditableGrid>();
 			foreach (var item in _db.QueryByExample(new Author()))
@@ -41,7 +29,7 @@ namespace Library
 				{
 					LastName = itemAut.LastName,
 					BirthDate = itemAut.BirthDate.ToShortDateString(),
-					IsPublication = _publication.Authors.Contains(itemAut)
+					IsPublication = false
 				});
 			}
 			authorsGrid.ItemsSource = collection.OrderBy(x => x.LastName);
@@ -97,20 +85,22 @@ namespace Library
 				|| PriceTxtBox.Text == String.Empty
 				|| PageFromTxtBox.Text == String.Empty
 				|| PageToTxtBox.Text == String.Empty
+				|| TypeCombo.SelectedIndex == -1
 			)
 			{
 				MessageBox.Show("Wypełnij wszystkie pola");
 				return;
 			}
-			_publication.Title = TitleTxtBox.Text.Replace(";", "").Trim();
-			_publication.Publisher = PublisherTxtBox.Text.Replace(";", "").Trim();
-			_publication.Year = Convert.ToInt32(YearTxtBox.Text);
-			_publication.Price = Convert.ToDecimal(PriceTxtBox.Text);
-			_publication.PageFrom = Convert.ToInt32(PageFromTxtBox.Text);
-			_publication.PageTo = Convert.ToInt32(PageToTxtBox.Text);
-			_publication.Type = (TypeCombo.SelectedValue as ComboBoxElement).Key;
-			_db.Store(_publication);
-			_publication.Authors = new List<Author>();
+			var publication = new Publication();
+			publication.Title = TitleTxtBox.Text.Replace(";", "").Trim();
+			publication.Publisher = PublisherTxtBox.Text.Replace(";", "").Trim();
+			publication.Year = Convert.ToInt32(YearTxtBox.Text);
+			publication.Price = Convert.ToDecimal(PriceTxtBox.Text);
+			publication.PageFrom = Convert.ToInt32(PageFromTxtBox.Text);
+			publication.PageTo = Convert.ToInt32(PageToTxtBox.Text);
+			publication.Type = (TypeCombo.SelectedValue as ComboBoxElement).Key;
+			publication.Authors = new List<Author>();
+			_db.Store(publication);
 			var all = _db.Query<Author>().ToList();
 			foreach (var item in authorsGrid.Items)
 			{
@@ -118,17 +108,11 @@ namespace Library
 				var one = all.Where(x => x.LastName == itemObj.LastName).First();
 				if (itemObj.IsPublication)
 				{
-					_publication.Authors.Add(one);
-					if (!one.Publications.Contains(_publication))
-						one.Publications.Add(_publication);
-				}
-				else
-				{
-					if (one.Publications.Contains(_publication))
-						one.Publications.Remove(_publication);
+					publication.Authors.Add(one);
+					one.Publications.Add(publication);
 				}
 			}
-			_db.Store(_publication.Authors);
+			_db.Store(publication.Authors);
 			isClosedWithSave = true;
 			this.Close();
 		}

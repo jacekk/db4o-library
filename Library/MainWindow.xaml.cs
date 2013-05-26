@@ -84,7 +84,7 @@ namespace Library
 			}
 		}
 		#endregion
-		#region btns
+		#region left btns
 		private void clearDatabaseBtn_Click(object sender, RoutedEventArgs e)
 		{
 			if (MessageBox.Show("Czy na pewno chcesz wyczyścić bazę?", "Potwierdzenie",
@@ -102,7 +102,7 @@ namespace Library
 				publicationsGrid.Visibility = Visibility.Collapsed;
 			}
 		}
-		private void addAuthorsBtn_Click(object sender, RoutedEventArgs e)
+		private void importAuthorsBtn_Click(object sender, RoutedEventArgs e)
         {
 			var lines = loadFile();
 			if (lines.Count() == 0)
@@ -134,7 +134,7 @@ namespace Library
 			MessageBox.Show(message);
 			showAuthorsList();
         }
-		private void addPublicationBtn_Click(object sender, RoutedEventArgs e)
+		private void importPublicationBtn_Click(object sender, RoutedEventArgs e)
 		{
 			var lines = loadFile();
 			if (lines.Count() == 0)
@@ -174,7 +174,7 @@ namespace Library
 			MessageBox.Show(message);
 			showPublicationList();
 		}
-		private void addRelationsBtn_Click(object sender, RoutedEventArgs e)
+		private void importRelationsBtn_Click(object sender, RoutedEventArgs e)
 		{
 			var lines = loadFile();
 			if (lines.Count() == 0)
@@ -223,6 +223,7 @@ namespace Library
 		private void showAuthorsBtn_Click(object sender, RoutedEventArgs e)
 		{
 			showAuthorsList();
+			authorSearchBox.Text = String.Empty;
 		}
 		private void showAuthorsList()
 		{
@@ -239,11 +240,13 @@ namespace Library
 			authorPublicationsListGrid.Visibility = Visibility.Collapsed;
 			authorsPublicationsNone.Visibility = Visibility.Collapsed;
 			editAuthorBtn.Visibility = Visibility.Collapsed;
-			authorSearchBox.Text = String.Empty; // TODO do not override filter
+			removeAuthorBtn.Visibility = Visibility.Collapsed;
+			authorsPublicationsCount.Content = String.Empty;
 		}
 		private void showPublicationBtn_Click(object sender, RoutedEventArgs e)
 		{
 			showPublicationList();
+			publicationSearchBox.Text = String.Empty;
 		}
 		private void showPublicationList()
 		{
@@ -260,7 +263,8 @@ namespace Library
 			publicationAuthorsListGrid.Visibility = Visibility.Collapsed;
 			publicationAuthorsNone.Visibility = Visibility.Collapsed;
 			editPublicationBtn.Visibility = Visibility.Collapsed;
-			publicationSearchBox.Text = String.Empty; // TODO do not override filter
+			removePublicationBtn.Visibility = Visibility.Collapsed;
+			publicationsAuthorsCount.Content = String.Empty;
 		}
 		private void exportAuthorsBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -307,6 +311,26 @@ namespace Library
 			});
 			saveFile("relacje", sb);
 		}
+		private void addAuthorBtn_Click(object sender, RoutedEventArgs e)
+		{
+			var dlg = new AddAuthorWindow(ref _db);
+			dlg.ShowDialog();
+			if (dlg.isClosedWithSave)
+			{
+				authorSearchBox.Text = String.Empty;
+				showAuthorsList();
+			}
+		}
+		private void addPublicationBtn_Click(object sender, RoutedEventArgs e)
+		{
+			var dlg = new AddPublicationWindow(ref _db);
+			dlg.ShowDialog();
+			if (dlg.isClosedWithSave)
+			{
+				publicationSearchBox.Text = String.Empty;
+				showPublicationList();
+			}
+		}
 		#endregion
 		#region grids
 		private void authorsListGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -344,6 +368,7 @@ namespace Library
 				authorsPublicationsCount.Content = String.Empty;
 			}
 			editAuthorBtn.Visibility = Visibility.Visible;
+			removeAuthorBtn.Visibility = Visibility.Visible;
 		}
 		private void publicationsListGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
@@ -382,6 +407,7 @@ namespace Library
 				publicationsAuthorsCount.Content = String.Empty;
 			}
 			editPublicationBtn.Visibility = Visibility.Visible;
+			removePublicationBtn.Visibility = Visibility.Visible;
 		}
 		#endregion
 		#region search
@@ -389,37 +415,41 @@ namespace Library
 		{
 			var phrase = (sender as TextBox).Text.ToLower();
 			if (phrase.Length == 0)
-			{
 				showAuthorsList();
-			}
 			else
-			{
-				authorsListGrid.ItemsSource = _db.Query<Author>(delegate(Author item) {
-					return item.LastName.ToLower().IndexOf(phrase) != -1;
-				});
-			}
+				filterAuthorList(phrase);
 			authorPublicationsListGrid.Visibility = Visibility.Collapsed;
 			authorsPublicationsNone.Visibility = Visibility.Collapsed;
+		}
+		private void filterAuthorList(string phrase)
+		{
+			authorsListGrid.ItemsSource = _db.Query<Author>(delegate(Author item)
+			{
+				return item.LastName.ToLower().IndexOf(phrase) != -1;
+			});
+			authorsPublicationsCount.Content = String.Empty;
 		}
 		private void publicationSearchBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			var phrase = (sender as TextBox).Text.ToLower();
 			if (phrase.Length == 0)
-			{
 				showPublicationList();
-			}
 			else
-			{
-				publicationsListGrid.ItemsSource = _db.Query<Publication>(delegate(Publication item) {
-					return item.Title.ToLower().IndexOf(phrase) != -1
-						|| item.Publisher.ToLower().IndexOf(phrase) != -1;
-				});
-			}
+				filterPublicationList(publicationSearchBox.Text);
 			publicationAuthorsListGrid.Visibility = Visibility.Collapsed;
 			publicationAuthorsNone.Visibility = Visibility.Collapsed;
 		}
+		private void filterPublicationList(string phrase)
+		{
+			publicationsListGrid.ItemsSource = _db.Query<Publication>(delegate(Publication item)
+			{
+				return item.Title.ToLower().IndexOf(phrase) != -1
+					|| item.Publisher.ToLower().IndexOf(phrase) != -1;
+			});
+			publicationsAuthorsCount.Content = String.Empty;
+		}
 		#endregion
-		#region edit
+		#region edit/delete
 		private void authorsListGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			editAuthor();
@@ -435,8 +465,21 @@ namespace Library
 			dlg.ShowDialog();
 			if (dlg.isClosedWithSave)
 			{
-				showAuthorsList();
+				if (authorSearchBox.Text.Length == 0)
+					showAuthorsList();
+				else
+					filterAuthorList(authorSearchBox.Text);
 				authorsListGrid.SelectedItem = author;
+			}
+		}
+		private void removeAuthorBtn_Click(object sender, RoutedEventArgs e)
+		{
+			var author = authorsListGrid.SelectedItem as Author;
+			if (MessageBox.Show("Czy na pewno chcesz usunąć autora o nazwisku '" + author .LastName+ "'?", "Potwierdzenie",
+				MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+			{
+				_db.Delete(author);
+				showAuthorsList();
 			}
 		}
 		private void editPublicationBtn_Click(object sender, RoutedEventArgs e)
@@ -453,8 +496,21 @@ namespace Library
 			var dlg = new EditPublicationWindow(ref _db, publication);
 			dlg.ShowDialog();
 			if (dlg.isClosedWithSave){
-				showPublicationList();
+				if (publicationSearchBox.Text.Length == 0)
+					showPublicationList();
+				else
+					filterPublicationList(publicationSearchBox.Text);
 				publicationsListGrid.SelectedItem = publication;
+			}
+		}
+		private void removePublicationBtn_Click(object sender, RoutedEventArgs e)
+		{
+			var publication = publicationsListGrid.SelectedItem as Publication;
+			if (MessageBox.Show("Czy na pewno chcesz usunąć publikację o tytule '" + publication.Title+ "'?", "Potwierdzenie",
+				MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+			{
+				_db.Delete(publication);
+				showPublicationList();
 			}
 		}
 		#endregion

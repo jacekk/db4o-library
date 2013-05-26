@@ -8,23 +8,16 @@ using System.Windows.Input;
 
 namespace Library
 {
-	public partial class EditAuthorWindow : Window
+	public partial class AddAuthorWindow : Window
 	{
 		#region properties
 		private IObjectContainer _db;
-		private Author _author;
 		public bool isClosedWithSave = false;
 		#endregion
-		public EditAuthorWindow(ref IObjectContainer db, Author author)
+		public AddAuthorWindow(ref IObjectContainer db)
 		{
 			InitializeComponent();
 			_db = db;
-			_author = author;
-			Title += _author.LastName;
-
-			// fill form
-			LastNameTxtBox.Text = _author.LastName;
-			BirthDatepicker.SelectedDate = _author.BirthDate;
 
 			var collection = new ObservableCollection<PublicationEditableGrid>();
 			foreach (var item in _db.QueryByExample(new Publication()))
@@ -34,7 +27,7 @@ namespace Library
 				{
 					Title = itemPub.Title,
 					Year = itemPub.Year,
-					IsAuthor = _author.Publications.Contains(itemPub)
+					IsAuthor = false
 				});
 			}
 			publicationsGrid.ItemsSource = collection.OrderBy(x => x.Title);
@@ -52,10 +45,11 @@ namespace Library
 				MessageBox.Show("Pole Nazwisko nie może być puste");
 				return;
 			}
-			_author.LastName = LastNameTxtBox.Text.Replace(";","").Trim();
-			_author.BirthDate = BirthDatepicker.SelectedDate.HasValue ? BirthDatepicker.SelectedDate.Value : DateTime.Now;
-			_author.Publications = new List<Publication>();
-			_db.Store(_author);
+			var author = new Author();
+			author.LastName = LastNameTxtBox.Text.Replace(";","").Trim();
+			author.BirthDate = BirthDatepicker.SelectedDate.HasValue ? BirthDatepicker.SelectedDate.Value : DateTime.Now;
+			author.Publications = new List<Publication>();
+			_db.Store(author);
 			var all = _db.Query<Publication>().ToList();
 			foreach (var item in publicationsGrid.Items)
 			{
@@ -63,18 +57,12 @@ namespace Library
 				var one = all.Where(x => x.Year == itemObj.Year && x.Title == itemObj.Title).First();
 				if (itemObj.IsAuthor)
 				{
-					_author.Publications.Add(one);
-					if (!one.Authors.Contains(_author))
-						one.Authors.Add(_author);
-				}
-				else
-				{
-					if (one.Authors.Contains(_author))
-						one.Authors.Remove(_author);
+					author.Publications.Add(one);
+					one.Authors.Add(author);
 				}
 				_db.Store(one.Authors);
 			}
-			_db.Store(_author.Publications);
+			_db.Store(author.Publications);
 			isClosedWithSave = true;
 			this.Close();
 		}
