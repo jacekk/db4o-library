@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 namespace Library
 {
+	// TODO: add book/article support
 	public partial class AddPublicationWindow : Window
 	{
 		#region properties
@@ -95,10 +96,10 @@ namespace Library
 			publication.Title = TitleTxtBox.Text.Replace(";", "").Trim();
 			publication.Publisher = PublisherTxtBox.Text.Replace(";", "").Trim();
 			publication.Year = Convert.ToInt32(YearTxtBox.Text);
-			publication.Price = Convert.ToDecimal(PriceTxtBox.Text);
-			publication.PageFrom = Convert.ToInt32(PageFromTxtBox.Text);
-			publication.PageTo = Convert.ToInt32(PageToTxtBox.Text);
-			publication.Type = (TypeCombo.SelectedValue as ComboBoxElement).Key;
+            //publication.Price = Convert.ToDecimal(PriceTxtBox.Text);
+            //publication.PageFrom = Convert.ToInt32(PageFromTxtBox.Text);
+            //publication.PageTo = Convert.ToInt32(PageToTxtBox.Text);
+            //publication.Type = (TypeCombo.SelectedValue as ComboBoxElement).Key;
 			publication.Authors = new List<Author>();
 			_db.Store(publication);
 			var all = _db.Query<Author>().ToList();

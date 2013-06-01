@@ -26,14 +26,14 @@
 		<TextBox Name="PublisherTxtBox" Grid.Column="1" Grid.Row="1" Height="24"/>
 		<Label Content="Rok:" Grid.Column="0" Grid.Row="2" HorizontalContentAlignment="Right"/>
 		<TextBox Name="YearTxtBox" Grid.Column="1" Grid.Row="2" Height="24" TextChanged="DigitsOnly_TextChanged"/>
-		<Label Content="Cena:" Grid.Column="0" Grid.Row="3" HorizontalContentAlignment="Right"/>
-		<TextBox Name="PriceTxtBox" Grid.Column="1" Grid.Row="3" Height="24" TextChanged="PriceTxtBox_TextChanged" MaxLength="20"/>
-		<Label Content="Od strony:" Grid.Column="0" Grid.Row="4" HorizontalContentAlignment="Right"/>
-		<TextBox Name="PageFromTxtBox" Grid.Column="1" Grid.Row="4" Height="24" TextChanged="DigitsOnly_TextChanged"/>
-		<Label Content="Do strony:" Grid.Column="0" Grid.Row="5" HorizontalContentAlignment="Right"/>
-		<TextBox Name="PageToTxtBox" Grid.Column="1" Grid.Row="5" Height="24" TextChanged="DigitsOnly_TextChanged"/>
-		<Label Content="Typ:" Grid.Column="0" Grid.Row="6" HorizontalContentAlignment="Right"/>
-		<ComboBox Name="TypeCombo" DisplayMemberPath="Value" SelectedValue="Key" Grid.Column="1"  Grid.Row="6" Height="24"/>
+		<Label Content="Typ:" Grid.Column="0" Grid.Row="3" HorizontalContentAlignment="Right"/>
+		<ComboBox Name="TypeCombo" DisplayMemberPath="Value" SelectedValue="Key" Grid.Column="1"  Grid.Row="3" Height="24" SelectionChanged="TypeCombo_SelectionChanged"/>
+			<Label Content="Cena:" Grid.Column="0" Grid.Row="4" HorizontalContentAlignment="Right"/>
+			<TextBox Name="PriceTxtBox" Grid.Column="1" Grid.Row="4" Height="24" TextChanged="PriceTxtBox_TextChanged" MaxLength="20"/>
+			<Label Content="Od strony:" Grid.Column="0" Grid.Row="5" HorizontalContentAlignment="Right"/>
+			<TextBox Name="PageFromTxtBox" Grid.Column="1" Grid.Row="5" Height="24" TextChanged="DigitsOnly_TextChanged"/>
+			<Label Content="Do strony:" Grid.Column="0" Grid.Row="6" HorizontalContentAlignment="Right"/>
+			<TextBox Name="PageToTxtBox" Grid.Column="1" Grid.Row="6" Height="24" TextChanged="DigitsOnly_TextChanged"/>
 		<DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left"
 				Name="authorsGrid" VerticalAlignment="Top" SelectionMode="Single" CanUserAddRows="False"
 				CanUserDeleteRows="False" SelectionUnit="FullRow"

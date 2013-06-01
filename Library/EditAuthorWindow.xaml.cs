@@ -74,7 +74,8 @@ namespace Library
 				}
 				_db.Store(one.Authors);
 			}
-			_db.Store(_author.Publications);
+            _db.Store(_author.Publications);
+            _db.Commit();
 			isClosedWithSave = true;
 			this.Close();
 		}

@@ -13,25 +13,36 @@ namespace Library
 	{
 		#region properties
 		private IObjectContainer _db;
-		private Publication _publication;
+		private dynamic _publication;
+		private bool _isBook;
 		public bool isClosedWithSave = false;
 		#endregion
-		public EditPublicationWindow(ref IObjectContainer db, Publication publication)
+		public EditPublicationWindow(ref IObjectContainer db, dynamic publication)
 		{
 			InitializeComponent();
 			TypeCombo.ItemsSource = StaticData.publicationTypes;
 			_db = db;
 			_publication = publication;
+			_isBook = _publication is Book;
 			Title += _publication.Title;
 
 			// fill form
 			TitleTxtBox.Text = _publication.Title;
 			PublisherTxtBox.Text = _publication.Publisher;
 			YearTxtBox.Text = _publication.Year.ToString();
-			PriceTxtBox.Text = _publication.Price.ToString();
-			PageFromTxtBox.Text = _publication.PageFrom.ToString();
-			PageToTxtBox.Text = _publication.PageTo.ToString();
-			TypeCombo.SelectedIndex = _publication.Type == 'A' ? 0 : 1;
+            if (_isBook)
+            {
+				TypeCombo.SelectedIndex = 1;
+                PriceTxtBox.Text = _publication.Price.ToString();
+				PageFromTxtBox.Text = String.Empty;
+				PageToTxtBox.Text = String.Empty;
+            } else {
+				TypeCombo.SelectedIndex = 0;
+				PriceTxtBox.Text = String.Empty;
+                PageFromTxtBox.Text = _publication.PageFrom.ToString();
+                PageToTxtBox.Text = _publication.PageTo.ToString();
+            }
+			toggleTxtBoxesVisibility();
 
 			var collection = new ObservableCollection<AuthorEditableGrid>();
 			foreach (var item in _db.QueryByExample(new Author()))
@@ -46,6 +57,12 @@ namespace Library
 			}
 			authorsGrid.ItemsSource = collection.OrderBy(x => x.LastName);
 			authorsGrid.SelectedItem = null;
+		}
+		private void toggleTxtBoxesVisibility()
+		{
+			PriceTxtBox.IsEnabled = _isBook;
+			PageFromTxtBox.IsEnabled = !_isBook;
+			PageToTxtBox.IsEnabled = !_isBook;
 		}
 		#region validation
 		private void DigitsOnly_TextChanged(object sender, TextChangedEventArgs e)
@@ -94,9 +111,9 @@ namespace Library
 			if (TitleTxtBox.Text == String.Empty
 				|| PublisherTxtBox.Text == String.Empty
 				|| YearTxtBox.Text == String.Empty
-				|| PriceTxtBox.Text == String.Empty
-				|| PageFromTxtBox.Text == String.Empty
-				|| PageToTxtBox.Text == String.Empty
+				|| (_isBook && PriceTxtBox.Text == String.Empty)
+				|| (!_isBook && PageFromTxtBox.Text == String.Empty)
+				|| (!_isBook && PageToTxtBox.Text == String.Empty)
 			)
 			{
 				MessageBox.Show("Wypełnij wszystkie pola");
@@ -105,12 +122,18 @@ namespace Library
 			_publication.Title = TitleTxtBox.Text.Replace(";", "").Trim();
 			_publication.Publisher = PublisherTxtBox.Text.Replace(";", "").Trim();
 			_publication.Year = Convert.ToInt32(YearTxtBox.Text);
-			_publication.Price = Convert.ToDecimal(PriceTxtBox.Text);
-			_publication.PageFrom = Convert.ToInt32(PageFromTxtBox.Text);
-			_publication.PageTo = Convert.ToInt32(PageToTxtBox.Text);
-			_publication.Type = (TypeCombo.SelectedValue as ComboBoxElement).Key;
-			_db.Store(_publication);
+			if (_isBook)
+			{
+				_publication.Price = Convert.ToDecimal(PriceTxtBox.Text);
+			}
+			else
+			{
+				_publication.PageFrom = Convert.ToInt32(PageFromTxtBox.Text);
+				_publication.PageTo = Convert.ToInt32(PageToTxtBox.Text);
+			}
 			_publication.Authors = new List<Author>();
+            _db.Store(_publication);
+
 			var all = _db.Query<Author>().ToList();
 			foreach (var item in authorsGrid.Items)
 			{
@@ -119,18 +142,26 @@ namespace Library
 				if (itemObj.IsPublication)
 				{
 					_publication.Authors.Add(one);
-					if (!one.Publications.Contains(_publication))
-						one.Publications.Add(_publication);
+                    if (!one.Publications.Contains(_publication))
+                        one.Publications.Add(_publication);
 				}
 				else
 				{
 					if (one.Publications.Contains(_publication))
 						one.Publications.Remove(_publication);
 				}
+                _db.Store(one.Publications);
 			}
 			_db.Store(_publication.Authors);
+            _db.Commit();
 			isClosedWithSave = true;
 			this.Close();
+		}
+
+		private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			// TODO: finish publication type change
+			toggleTxtBoxesVisibility();
 		}
 	}
 }

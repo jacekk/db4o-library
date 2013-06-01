@@ -62,7 +62,6 @@
 						<DataGridTextColumn Header="Cena"  Binding="{Binding Path=Price}" Width="40"/>
 						<DataGridTextColumn Header="Od strony" Binding="{Binding Path=PageFrom}" Width="70"/>
 						<DataGridTextColumn Header="Do strony" Binding="{Binding Path=PageTo}" Width="70"/>
-						<DataGridTextColumn Header="Typ" Binding="{Binding Path=Type}" Width="30"/>
 					</DataGrid.Columns>
 				</DataGrid>
 				<Label Content="Szukaj:" Grid.Column="0" Grid.Row="2" Width="50" Height="24" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
@@ -98,7 +97,6 @@
 						<DataGridTextColumn Header="Cena"  Binding="{Binding Path=Price}" Width="40"/>
 						<DataGridTextColumn Header="Od strony" Binding="{Binding Path=PageFrom}" Width="70"/>
 						<DataGridTextColumn Header="Do strony" Binding="{Binding Path=PageTo}" Width="70"/>
-						<DataGridTextColumn Header="Typ" Binding="{Binding Path=Type}" Width="30"/>
 					</DataGrid.Columns>
 				</DataGrid>
 				<Label Name="publicationsAuthorsCount" Grid.Column="2" Grid.Row="0" Width="50" HorizontalAlignment="Right" HorizontalContentAlignment="Right"/>

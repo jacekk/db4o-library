@@ -150,21 +150,31 @@ namespace Library
 						var check = _db.QueryByExample(new Publication() {
 							Title = elements[0].Trim(),
 							Publisher = elements[1].Trim(),
-							Type = elements[6].Trim().ToCharArray().First()
+                            //Type = elements[6].Trim().ToCharArray().First()
 						});
 						if (check.Count == 0)
 						{
-							_db.Store(new Publication()
-							{
-								Title = elements[0].Trim(),
-								Publisher = elements[1].Trim(),
-								Year = elements[2] != "" ? Int32.Parse(elements[2].Trim()) : 0,
-								Price = elements[3] != "" ? Convert.ToDecimal(elements[3].Trim()) : 0,
-								PageFrom = elements[4] != "" ? Int32.Parse(elements[4].Trim()) : 0,
-								PageTo = elements[5] != "" ? Int32.Parse(elements[5].Trim()) : 0,
-								Type = elements[6].Trim().ToCharArray().First(),
-								Authors = new List<Author>()
-							});
+                            if (elements[6].Trim() == "K")
+                            {
+                                _db.Store(new Book()
+                                {
+                                    Title = elements[0].Trim(),
+                                    Publisher = elements[1].Trim(),
+                                    Year = elements[2] != "" ? Int32.Parse(elements[2].Trim()) : 0,
+                                    Price = elements[3] != "" ? Convert.ToDecimal(elements[3].Trim()) : 0,
+                                    Authors = new List<Author>()
+                                });
+                            } else {
+                                _db.Store(new Article()
+                                {
+                                    Title = elements[0].Trim(),
+                                    Publisher = elements[1].Trim(),
+                                    Year = elements[2] != "" ? Int32.Parse(elements[2].Trim()) : 0,
+                                    PageFrom = elements[4] != "" ? Int32.Parse(elements[4].Trim()) : 0,
+                                    PageTo = elements[5] != "" ? Int32.Parse(elements[5].Trim()) : 0,
+                                    Authors = new List<Author>()
+                                });
+                            }
 							counter++;
 						}
 					}
@@ -188,11 +198,17 @@ namespace Library
 					string[] elements = lines[i].Split(new string[] { ";" }, StringSplitOptions.None);
 					if (elements.Count() == 2)
 					{
-						var pubCheck = _db.QueryByExample(new Publication() { Title = elements[0].Trim() });
+                        var artCheck = _db.QueryByExample(new Article() { Title = elements[0].Trim() });
+                        var bookCheck = _db.QueryByExample(new Book() { Title = elements[0].Trim() });
 						var autCheck = _db.QueryByExample(new Author() { LastName = elements[1].Trim() });
-						if (pubCheck.Count == 1 && autCheck.Count == 1)
+                        IObjectSet check = null;
+                        if (bookCheck.Count == 1)
+                            check = bookCheck;
+                        if (artCheck.Count == 1)
+                            check = artCheck;
+						if (check != null && autCheck.Count == 1)
 						{
-							var publication = pubCheck.Next() as Publication;
+                            var publication = check.Next() as Publication;
 							var author = autCheck.Next() as Author;
 							if (!publication.Authors.Contains(author))
 							{
@@ -287,11 +303,11 @@ namespace Library
 				sb.AppendLine(String.Format("{0};{1};{2};{3};{4};{5};{6}",
 					x.Title,
 					x.Publisher,
-					x.Year,
-					x.Price,
-					x.PageFrom,
-					x.PageTo,
-					x.Type
+					x.Year
+                    //x.Price,
+                    //x.PageFrom,
+                    //x.PageTo,
+                    //x.Type
 				));
 			});
 			saveFile("publikacje", sb);

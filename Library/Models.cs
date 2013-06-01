@@ -14,12 +14,17 @@ namespace Library
 		public string Title { get; set; }
 		public string Publisher { get; set; }
 		public int Year { get; set; }
-		public decimal Price { get; set; }
-		public int PageFrom { get; set; }
-		public int PageTo { get; set; }
-		public char Type { get; set; }
 		public List<Author> Authors { get; set; }
 	}
+    public class Book : Publication
+    {
+        public decimal Price { get; set; }
+    }
+    public class Article : Publication
+    {
+        public int PageFrom { get; set; }
+        public int PageTo { get; set; }
+    }
 	public class PublicationEditableGrid
 	{
 		public string Title { get; set; }
